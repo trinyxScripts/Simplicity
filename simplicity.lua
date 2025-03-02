@@ -2131,44 +2131,45 @@ function Library:CreateWindow(options)
 		end
 		--drag
 		do
-		local topbar = GUI["12"]
-		local draggableFrame = GUI["10"]
-		local isDragging = false
-		local dragStart = nil
-		local startPos = nil
-		local currentTween = nil
-		
-		
-		
-		local function smoothMove(targetPosition)
-			if currentTween then currentTween:Cancel() end
-			currentTween = Library:tween(draggableFrame, {Position = targetPosition}, 0.80, Enum.EasingStyle.Exponential)
-		end
-
-		topbar.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
-				isDragging = true
-				dragStart = input.Position
-				startPos = draggableFrame.Position
+			local topbar = GUI["12"]
+			local draggableFrame = GUI["10"]
+			local isDragging = false
+			local dragStart = nil
+			local startPos = nil
+			local currentTween = nil
+			local inputType = nil -- Track input type (mouse or touch)
+			
+			local function smoothMove(targetPosition)
+				if currentTween then currentTween:Cancel() end
+				currentTween = Library:tween(draggableFrame, {Position = targetPosition}, 0.80, Enum.EasingStyle.Exponential)
 			end
-		end)
-
-		uis.InputEnded:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 then
-				isDragging = false
-			end
-		end)
-
-		uis.InputChanged:Connect(function(input)
-			if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-				local mouseOffset = input.Position - dragStart
-				local targetPosition = UDim2.new(
-					startPos.X.Scale, startPos.X.Offset + mouseOffset.X,
-					startPos.Y.Scale, startPos.Y.Offset + mouseOffset.Y
-				)
-				smoothMove(targetPosition)
-			end
-		end)
+			
+			topbar.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+					isDragging = true
+					dragStart = input.Position
+					startPos = draggableFrame.Position
+					inputType = input.UserInputType -- Store input type
+				end
+			end)
+			
+			uis.InputEnded:Connect(function(input)
+				if input.UserInputType == inputType then -- Ensure it matches the started input type
+					isDragging = false
+				end
+			end)
+			
+			uis.InputChanged:Connect(function(input)
+				if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+					local mouseOffset = input.Position - dragStart
+					local targetPosition = UDim2.new(
+						startPos.X.Scale, startPos.X.Offset + mouseOffset.X,
+						startPos.Y.Scale, startPos.Y.Offset + mouseOffset.Y
+					)
+					smoothMove(targetPosition)
+				end
+			end)
+			
 			
 		end
 		--topbarButtons
@@ -2211,7 +2212,7 @@ function Library:CreateWindow(options)
 		
 		function GUI:Notification(options)
 			options = Library:Validate({
-				Title = "KeyBind",
+				Title = "",
 				Text = "",
 			},options or {})
 
@@ -2343,6 +2344,80 @@ function Library:CreateWindow(options)
 	
 	return GUI
 end
+
+
+local window = Library:CreateWindow({
+	LoadingAnimation = {
+		Title = "LOPL",
+		Text = "WORKS Welcome to my ui library. Hope you enjouy it",
+		Duration = 2
+	}
+})
+
+local tab= window:CreateTab({
+	Icon = "rbxassetid://10709753149",
+	Text = "Tab1"
+})
+local tab1 = window:CreateTab({
+	Icon = "rbxassetid://10747373426",
+	Text = "Tab2"
+})
+
+do
+
+tab1:CreateButton({
+	Text = "Button3",
+	Callback = function() print("HI") end
+	})
+	
+	tab1:Seperator()
+	
+
+	
+tab1:Label({
+	Title = "Hello",
+	Text = "Hello its really nice to meet such a wholesome person. i really like that the paragraph box is enlarging and fitting me what would have i done without it :)",
+})
+tab:Paragraph({
+	Text = "Hello its really nice to meet such a wholesome person. i really like that the paragraph box is enlarging and fitting me what would have i done without it :)",
+	})
+	
+	tab1:Toggle({
+		Text = "Toggle",
+		DefaultState = false,
+		Callback = function(v) 
+			print(v)
+		end
+	})
+	tab1:TextInput({
+		Text = "TextInput",
+		PlaceHolderText = "Txt",
+		Callback = function(v) print(v) end
+	})
+	tab1:Slider({
+		Text = "Slid",
+		StartingValue = 34,
+		max = 100,
+		min = 0,
+		Callback = function(v) print(v) end
+	})
+	
+	tab:KeyBind({
+		Text = "KeyBind",
+		Bind = Enum.KeyCode.R,
+		Callback = function(v) 
+			window:Notification()
+		end
+	})
+	tab:DropDown({
+		Text = "KeyBind",
+		Options = {"Option 1","Option 2"},
+		CurrentOption = {"Option 1"},
+		Callback = function(Options)
+			print(Options)
+		end,
+	})
+	
 end
 
 return Library
