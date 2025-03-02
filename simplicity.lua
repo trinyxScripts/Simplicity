@@ -1,3 +1,26 @@
+local PromptInterface = loadstring(game:HttpGet("https://raw.githubusercontent.com/trinyxScripts/Prompt-UI/refs/heads/main/load.lua"))()
+
+
+local function GetMobile()
+    if game:GetService("UserInputService").TouchEnabled and not game:GetService("UserInputService").MouseEnabled then
+        return "Mobile"
+    else
+        return "Computer" 
+    end
+ end
+
+if GetMobile() == "Mobile" then
+ 	PromptInterface.create(
+        "Incompatable", -- Title
+        " Mobile is yet not supported by Revin", -- Description
+        "Ok", -- Primary Button Text
+        "", -- Secondary Button Text
+        function(response)
+        end
+    )
+	return
+end
+
 local tweenService = game:GetService("TweenService")
 local uis = game:GetService("UserInputService")
 local players = game:GetService("Players")
