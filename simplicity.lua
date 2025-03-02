@@ -16,9 +16,13 @@ if GetMobile() == "Mobile" then
         "Ok", -- Primary Button Text
         "", -- Secondary Button Text
         function(response)
+		if responce then
+			else
+				return
+			end
         end
     )
-	return
+	
 end
 
 local tweenService = game:GetService("TweenService")
